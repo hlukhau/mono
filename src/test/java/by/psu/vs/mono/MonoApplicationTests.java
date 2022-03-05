@@ -59,7 +59,7 @@ class MonoApplicationTests {
 
 			Runnable r3 = () -> {
 				while (true) {
-					log.info("------------------------------------");
+					log.info("====================");
 					for (String key : simpleMap.keySet()) {
 						log.info(key + " - " + simpleMap.get(key));
 					}
