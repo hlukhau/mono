@@ -3,11 +3,13 @@ package by.psu.vs.mono;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.w3c.dom.ranges.Range;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 
 @SpringBootTest
 @Slf4j
@@ -78,4 +80,47 @@ class MonoApplicationTests {
 		}
 	}
 
+	class MyThread extends Thread {
+		private String s;
+		private Object o;
+		private int counter = 0;
+
+		public MyThread(String s, Object o) {
+			super();
+			this.s = s;
+			this.o = o;
+		}
+
+		private void print() {
+			try {
+				synchronized (o) {
+					IntStream.range(1, 100).forEach(i -> System.out.print(s));
+					Thread.sleep(10);
+					System.out.print(" " + getName() + "\n");
+					counter++;
+				}
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		public void run() {
+			while (true) {
+				print();
+
+				if (! "1".equals(s) && counter == 2) break;
+			}
+		}
+	}
+
+	@Test
+	public void threadsTest() {
+		for(int i = 0; i < 10; i++) {
+			new MyThread("" + i, this).start();
+		}
+
+		sleep(1000);
+	}
 }
