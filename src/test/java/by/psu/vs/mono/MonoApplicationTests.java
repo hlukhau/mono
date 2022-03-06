@@ -1,5 +1,7 @@
 package by.psu.vs.mono;
 
+import by.psu.vs.mono.utils.EchoClient;
+import by.psu.vs.mono.utils.EchoServer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +12,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -115,4 +119,52 @@ class MonoApplicationTests {
 		}
 	}
 
+	private String getComputerName()
+	{
+		Map<String, String> env = System.getenv();
+		if (env.containsKey("COMPUTERNAME"))
+			return env.get("COMPUTERNAME");
+		else if (env.containsKey("HOSTNAME"))
+			return env.get("HOSTNAME");
+		else
+			return "Unknown Computer";
+	}
+
+	private String getComputerName2()
+	{
+		String hostname = "";
+		String ip = "";
+		InetAddress addr;
+		try {
+			addr = InetAddress.getLocalHost();
+			hostname = addr.getHostName();
+			ip = addr.getHostAddress();
+		}
+		catch (UnknownHostException ex) {
+			System.out.println("Hostname can not be resolved");
+		}
+		//if (hostname.length() == 0) {
+			hostname = ip;
+		//}
+		return hostname;
+	}
+
+	@Test
+	public void getComputerNameTest() {
+
+		log.info(getComputerName2());
+		log.info(getComputerName());
+	}
+
+	@Test
+	public void testUDP() throws Exception {
+		//EchoServer server = new EchoServer();
+		//server.start();
+
+		EchoClient client = new EchoClient();
+
+		String result = client.sendEcho("from client");
+
+		log.info("===============" + result);
+	}
 }
