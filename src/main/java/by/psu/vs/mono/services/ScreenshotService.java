@@ -17,8 +17,10 @@ public class ScreenshotService {
     }
 
     @Scheduled(fixedDelay = 1000)
-    public void scheduleFixedDelayTask() {
-        makeScreenShot("saved.png");
+    public void  scheduleFixedDelayTask() {
+        synchronized (this) {
+            makeScreenShot("saved.png");
+        }
     }
 
     public void makeScreenShot(String path) {

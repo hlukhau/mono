@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>PSU</title>
+
+    <style>
+.popup {
+  z-index: 9;
+  background-color: #f1f1f1;
+  border: 1px solid #d3d3d3;
+  text-align: center;
+  min-height: 150px;
+  min-width: 300px;
+  max-height: 500px;
+  max-width: 600px;
+}
+
+/*Drgable */
+
+.popup {
+  position: absolute;
+  /*resize: both; !*enable this to css resize*! */
+  overflow: auto;
+}
+
+.popup-header {
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  background-color: #2196f3;
+  color: #fff;
+}
+
+/*Resizeable*/
+
+.popup .resizer-right {
+  width: 5px;
+  height: 100%;
+  background: transparent;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: e-resize;
+}
+
+.popup .resizer-bottom {
+  width: 100%;
+  height: 5px;
+  background: transparent;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: n-resize;
+}
+
+.popup .resizer-both {
+  width: 5px;
+  height: 5px;
+  background: transparent;
+  z-index: 10;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  cursor: nw-resize;
+}
+
+/*NOSELECT*/
+
+.popup * {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+    </style>
+
+    <script type="module">
+window.onload = function() {
+  initDragElement();
+  initResizeElement();
+};
+
+function initDragElement() {
+  var pos1 = 0,
+    pos2 = 0,
+    pos3 = 0,
+    pos4 = 0;
+  var popups = document.getElementsByClassName("popup");
+  var elmnt = null;
+  var currentZIndex = 100; //TODO reset z index when a threshold is passed
+
+  for (var i = 0; i < popups.length; i++) {
+    var popup = popups[i];
+    var header = getHeader(popup);
+
+    popup.onmousedown = function() {
+      this.style.zIndex = "" + ++currentZIndex;
+    };
+
+    if (header) {
+      header.parentPopup = popup;
+      header.onmousedown = dragMouseDown;
+    }
+  }
+
+  function dragMouseDown(e) {
+    elmnt = this.parentPopup;
+    elmnt.style.zIndex = "" + ++currentZIndex;
+
+    e = e || window.event;
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    if (!elmnt) {
+      return;
+    }
+
+    e = e || window.event;
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = elmnt.offsetTop - pos2 + "px";
+    elmnt.style.left = elmnt.offsetLeft - pos1 + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
+  }
+
+  function getHeader(element) {
+    var headerItems = element.getElementsByClassName("popup-header");
+
+    if (headerItems.length === 1) {
+      return headerItems[0];
+    }
+
+    return null;
+  }
+}
+
+function initResizeElement() {
+  var popups = document.getElementsByClassName("popup");
+  var element = null;
+  var startX, startY, startWidth, startHeight;
+
+  for (var i = 0; i < popups.length; i++) {
+    var p = popups[i];
+
+    var right = document.createElement("div");
+    right.className = "resizer-right";
+    p.appendChild(right);
+    right.addEventListener("mousedown", initDrag, false);
+    right.parentPopup = p;
+
+    var bottom = document.createElement("div");
+    bottom.className = "resizer-bottom";
+    p.appendChild(bottom);
+    bottom.addEventListener("mousedown", initDrag, false);
+    bottom.parentPopup = p;
+
+    var both = document.createElement("div");
+    both.className = "resizer-both";
+    p.appendChild(both);
+    both.addEventListener("mousedown", initDrag, false);
+    both.parentPopup = p;
+  }
+
+  function initDrag(e) {
+    element = this.parentPopup;
+
+    startX = e.clientX;
+    startY = e.clientY;
+    startWidth = parseInt(
+      document.defaultView.getComputedStyle(element).width,
+      10
+    );
+    startHeight = parseInt(
+      document.defaultView.getComputedStyle(element).height,
+      10
+    );
+    document.documentElement.addEventListener("mousemove", doDrag, false);
+    document.documentElement.addEventListener("mouseup", stopDrag, false);
+  }
+
+  function doDrag(e) {
+    element.style.width = startWidth + e.clientX - startX + "px";
+    element.style.height = startHeight + e.clientY - startY + "px";
+  }
+
+  function stopDrag() {
+    document.documentElement.removeEventListener("mousemove", doDrag, false);
+    document.documentElement.removeEventListener("mouseup", stopDrag, false);
+  }
+}
+
+var images = new Map;
+
+setInterval(function() {
+    var list = document.querySelectorAll("img");
+    list.forEach(function(image) {
+        var name = images.get(image);
+        if (name == null) {
+            images.set(image, image.src);
+            name = image.src;
+        }
+        var s = name + "?" + new Date().getTime();
+        image.src = s;
+    });
+}, 1000);
+
+</script>
+</head>
+<body>
+<h1>Welcome to developers Supervisor</h1>
+<!--<div id="one">-->
+<!--    <h2 th:text="${message}">-->
+<!--        <span>message will print here</span>-->
+<!--    </h2>-->
+<!--</div>-->
+<div class="popup" width="300px" style="left: 400px">
+    <div class="popup-header">Vova screen</div>
+    <p><img src="/image" width="90%"></p>
+</div>
+
+<div class="popup" width="300px">
+    <div class="popup-header">My screen</div>
+    <p><img src="/image" width="90%"></p>
+</div>
+</body>
+</html>
