@@ -230,12 +230,6 @@ window.onerror = function() {
 </head>
 <body>
 <h1>Welcome to developers Supervisor</h1>
-<!--<div id="one">-->
-<!--    <h2 th:text="${message}">-->
-<!--        <span>message will print here</span>-->
-<!--    </h2>-->
-<!--</div>-->
-
     <div class="popup" th:each="d : ${desktops}" th:style="${d.style}">
         <div class="popup-header" th:text="${d.name}"></div>
         <p><img th:src="${d.url}" width="90%" onerror="this.style.display='none'" onload="this.style.display=''"></p>

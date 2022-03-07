@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 @Service
 public class ScreenshotService {
@@ -17,10 +18,13 @@ public class ScreenshotService {
     }
 
     @Scheduled(fixedDelay = 1000)
-    public void  scheduleFixedDelayTask() {
-        synchronized (this) {
-            makeScreenShot("saved.png");
-        }
+    synchronized public void  scheduleFixedDelayTask() {
+        makeScreenShot("saved.png");
+    }
+
+    synchronized public byte[] getScreenShot()  throws IOException {
+        File outputFile = new File("saved.png");
+        return Files.readAllBytes(outputFile.toPath());
     }
 
     public void makeScreenShot(String path) {
