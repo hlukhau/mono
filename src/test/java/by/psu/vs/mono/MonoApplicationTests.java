@@ -3,6 +3,7 @@ package by.psu.vs.mono;
 import by.psu.vs.mono.utils.EchoClient;
 import by.psu.vs.mono.utils.EchoServer;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -157,6 +158,7 @@ class MonoApplicationTests {
 	}
 
 	@Test
+	@Disabled
 	public void testUDP() throws Exception {
 		//EchoServer server = new EchoServer();
 		//server.start();
