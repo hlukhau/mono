@@ -224,6 +224,8 @@ setInterval(function() {
     });
 }, 1000);
 
+window.onerror = function() {
+};
 </script>
 </head>
 <body>
@@ -236,7 +238,7 @@ setInterval(function() {
 
     <div class="popup" th:each="d : ${desktops}" th:style="${d.style}">
         <div class="popup-header" th:text="${d.name}"></div>
-        <p><img th:src="${d.url}" width="90%"></p>
+        <p><img th:src="${d.url}" width="90%" onerror="this.style.display='none'" onload="this.style.display=''"></p>
     </div>
 </body>
 </html>
