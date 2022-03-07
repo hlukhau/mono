@@ -1,0 +1,5 @@
+[
+  {"name": "My desktop", "url": "http://localhost:8888/image", "style":  "left: 636px; top: 42px; z-index: 108;"},
+  {"name": "Vova desktop", "url": "http://localhost:8888/image", "style":  "top: 143px; z-index: 109; left: 202px; width: 365px; height: 267px;"},
+  {"name": "Serega desktop", "url": "http://localhost:8888/image", "style":  "z-index: 103; width: 341px; height: 247px; top: 486px; left: 426px;"}
+]

@@ -233,14 +233,10 @@ setInterval(function() {
 <!--        <span>message will print here</span>-->
 <!--    </h2>-->
 <!--</div>-->
-<div class="popup" width="300px" style="left: 400px">
-    <div class="popup-header">Vova screen</div>
-    <p><img src="/image" width="90%"></p>
-</div>
 
-<div class="popup" width="300px">
-    <div class="popup-header">My screen</div>
-    <p><img src="/image" width="90%"></p>
-</div>
+    <div class="popup" th:each="d : ${desktops}" th:style="${d.style}">
+        <div class="popup-header" th:text="${d.name}"></div>
+        <p><img th:src="${d.url}" width="90%"></p>
+    </div>
 </body>
 </html>
