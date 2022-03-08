@@ -47,4 +47,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
         // returning the view name
         return "index";
     }
+
+    @GetMapping("/name")
+    public @ResponseBody String getName() {
+        return screenshotService.getComputerName();
+    }
 }

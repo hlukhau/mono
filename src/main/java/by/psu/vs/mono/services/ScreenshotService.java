@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 
 @Service
@@ -25,6 +27,33 @@ public class ScreenshotService {
     synchronized public byte[] getScreenShot()  throws IOException {
         File outputFile = new File("saved.png");
         return Files.readAllBytes(outputFile.toPath());
+    }
+
+    public String getComputerIp() {
+        String ip = "";
+        InetAddress addr;
+        try {
+            addr = InetAddress.getLocalHost();
+            ip = addr.getHostAddress();
+        }
+        catch (UnknownHostException ex) {
+            System.out.println("Hostname can not be resolved");
+        }
+        return ip;
+    }
+
+    public String getComputerName()
+    {
+        String hostname = "";
+        InetAddress addr;
+        try {
+            addr = InetAddress.getLocalHost();
+            hostname = addr.getHostName();
+        }
+        catch (UnknownHostException ex) {
+            System.out.println("Hostname can not be resolved");
+        }
+        return hostname;
     }
 
     public void makeScreenShot(String path) {
