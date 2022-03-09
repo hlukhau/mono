@@ -1,5 +1,4 @@
 [
-  {"name": "Vova desktop", "url": "http://192.168.91.237:8888/image", "style":  "left: 636px; top: 42px; z-index: 108;"},
-  {"name": "Dima desktop", "url": "http://localhost:8888/image", "style":  "top: 143px; z-index: 109; left: 202px; width: 365px; height: 267px;"},
-  {"name": "Tania desktop", "url": "http://localhost:8888/image", "style":  "z-index: 103; width: 341px; height: 247px; top: 486px; left: 426px;"}
+{"name": "Dima", "url": "http://localhost:8888/image", "style": "top: 535px; left: 982px; width: 598px; height: 477px;"}
+, {"name": "Alex", "url": "http://localhost:8888/image", "style": "top: 62px; left: 972px; width: 600px; height: 439px;"}
 ]

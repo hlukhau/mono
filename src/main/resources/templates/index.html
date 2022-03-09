@@ -32,6 +32,16 @@
   color: #fff;
 }
 
+.popup-header-right {
+  padding: 10px;
+  cursor: move;
+  z-index: 10;
+  background-color: #2196f3;
+  color: #fff;
+  float: right;
+  height: 16px;
+}
+
 /*Resizeable*/
 
 .popup .resizer-right {
@@ -77,6 +87,48 @@
                                   supported by Chrome and Opera */
 }
 
+
+
+.button {
+  display: inline-block;
+  border-radius: 4px;
+  background-color: #0051ff;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 16px;
+  padding: 20px;
+  width: 200px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.button span {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.button span:after {
+  content: '\00bb';
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  right: -20px;
+  transition: 0.5s;
+}
+
+.button:hover span {
+  padding-right: 25px;
+}
+
+.button:hover span:after {
+  opacity: 1;
+  right: 0;
+}
+
     </style>
 
     <script type="module">
@@ -84,6 +136,7 @@ window.onload = function() {
   initDragElement();
   initResizeElement();
 };
+
 
 function initDragElement() {
   var pos1 = 0,
@@ -224,15 +277,64 @@ setInterval(function() {
     });
 }, 1000);
 
+
 window.onerror = function() {
 };
 </script>
 </head>
 <body>
 <h1>Welcome to developers Supervisor</h1>
+<button class="button" style="vertical-align:middle" onclick="location.href='/rescan'" type="button"><span>Rescan network </span></button>
+<button id='saveId' class="button" style="vertical-align:middle" type="button"><span>Save desktop</span></button>
     <div class="popup" th:each="d : ${desktops}" th:style="${d.style}">
+        <div class="popup-header-right"><button onclick="this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">x</button></div>
         <div class="popup-header" th:text="${d.name}"></div>
         <p><img th:src="${d.url}" width="90%" onerror="this.style.display='none'" onload="this.style.display=''"></p>
     </div>
 </body>
+
+<script>
+
+var save = document.getElementById('saveId');
+
+save.addEventListener('click', function() {
+    var list = document.querySelectorAll(".popup");
+    var json = "[\n";
+    var add = "";
+
+    list.forEach(function(div) {
+        var img = div.querySelector("img");
+        var head = div.querySelector(".popup-header");
+
+        var style = div.style;
+        var width = div.clientWidth;
+        var height = div.clientHeight;
+        var record = "top: " + style.top + "; left: " + style.left + "; width: " + width + "px; height: " + height + "px;";
+        var src = img.src;
+
+        var index = src.indexOf("?");
+        console.log(index);
+        var url = src;
+
+        if (index != -1) {
+            url = src.substring(0, index);
+        }
+
+        json += add + "{\"name\": \"" + head.innerText + "\", \"url\": " + "\"" + url + "\", \"style\": \"" + record + "\"}\n";
+        add = ", ";
+    });
+
+    json += "]";
+
+    console.log(json);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'http://localhost:8888/save');
+    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    xhr.send(json);
+});
+
+
+</script>
+
 </html>

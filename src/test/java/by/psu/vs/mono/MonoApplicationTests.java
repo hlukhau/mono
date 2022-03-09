@@ -1,11 +1,16 @@
 package by.psu.vs.mono;
 
+import by.psu.vs.mono.services.ScreenshotService;
 import by.psu.vs.mono.utils.EchoClient;
 import by.psu.vs.mono.utils.EchoServer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 import javax.imageio.ImageIO;
 import javax.swing.filechooser.FileSystemView;
@@ -13,20 +18,24 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.*;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-@SpringBootTest
+@SpringBootTest(classes = MonoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
 class MonoApplicationTests {
 
 	static {
 		System.setProperty("java.awt.headless", "false");
 	}
+
+	@Autowired
+	private ScreenshotService screenshotService;
+
 	private final Map<String, String> simpleMap = new ConcurrentHashMap<>();//new HashMap<>();
 
 	public int getRandomNumber(int max) {
@@ -168,5 +177,17 @@ class MonoApplicationTests {
 		String result = client.sendEcho("from client");
 
 		log.info("===============" + result);
+	}
+
+	@Test
+	public void scanClients() throws URISyntaxException, IOException, URISyntaxException {
+
+		screenshotService.scanIps();
+
+		log.info("\n");
+
+		screenshotService.ips.forEach((k,v) -> {
+			if(! "".equals(v)) {log.info(k + " " + v);}
+		});
 	}
 }
