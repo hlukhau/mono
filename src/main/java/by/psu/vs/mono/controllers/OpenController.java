@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
                 new ObjectMapper().readValue(json, ArrayList.class);
 
         model.addAttribute("desktops", result);
+
         // returning the view name
         return "index";
     }
