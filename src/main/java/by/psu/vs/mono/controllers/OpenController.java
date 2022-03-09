@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.view.RedirectView;
 
 
 @Controller
@@ -76,7 +77,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
     }
 
     @GetMapping("/rescan")
-    public String rescan(Model model) throws IOException {
+    public RedirectView rescan(Model model) throws IOException {
 
         // Пересканирование локальной сети всегда
         screenshotService.scanIps();
@@ -86,7 +87,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
         model.addAttribute("desktops", result);
 
         // Формирование страницы index.html по шаблону /templates/index.html
-        return "index";
+        return new RedirectView("/");
     }
 
     ArrayList makeArrayListOfDesktops() throws IOException {
