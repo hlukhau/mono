@@ -19,11 +19,16 @@ WORKDIR /home/developer
 #-net=host -e DISPLAY=unix:0.0 -e XAUTHORITY=/tmp/.docker.xauth -v /tmp/.X11-unix:/tmp/.X11-unix
 ENV DISPLAY unix:0.0
 ENV XAUTHORITY /tmp/.docker.xauth
+ENV HOSTNAME mono-docker
 VOLUME /tmp/.X11-unix /tmp/.X11-unix
 
 
 EXPOSE 8888
 
+
 COPY ./target/mono-0.0.1-SNAPSHOT.jar ./app.jar
 COPY ./configuration.json ./configuration.json
+USER root
+RUN chmod 777 ./configuration.json
+USER developer
 ENTRYPOINT ["java", "-jar", "./app.jar"]
