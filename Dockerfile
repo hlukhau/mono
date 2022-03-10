@@ -2,7 +2,6 @@ FROM mcr.microsoft.com/openjdk/jdk:17-ubuntu
 
 RUN apt-get -y update
 
-# RUN DEBIAN_FRONTEND=noninteractive
 RUN apt-get install -y libxext-dev libxrender-dev libxtst-dev
 
 RUN export uid=1001 gid=1001 && \
@@ -16,7 +15,6 @@ USER developer
 ENV HOME /home/developer
 WORKDIR /home/developer
 
-#-net=host -e DISPLAY=unix:0.0 -e XAUTHORITY=/tmp/.docker.xauth -v /tmp/.X11-unix:/tmp/.X11-unix
 ENV DISPLAY unix:0.0
 ENV XAUTHORITY /tmp/.docker.xauth
 ENV HOSTNAME mono-docker
