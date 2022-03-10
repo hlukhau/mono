@@ -11,11 +11,17 @@ RUN export uid=1001 gid=1001 && \
     echo "developer ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers && \
     chown developer:developer -R /home/developer
 
+
 USER developer
 ENV HOME /home/developer
 WORKDIR /home/developer
 
-ENV DISPLAY unix:0.0
+# before that you need to do several linux command on the linux computer with docker
+# xauth list $DISPLAY
+# export DISPLAY=:0
+# xhost +local:all
+
+ENV DISPLAY :0
 ENV XAUTHORITY /tmp/.docker.xauth
 ENV HOSTNAME mono-docker
 VOLUME /tmp/.X11-unix /tmp/.X11-unix
