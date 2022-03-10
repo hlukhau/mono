@@ -130,6 +130,24 @@ public class ScreenshotService {
                     // помещение пары (url-получения скриншота, имя компьютера) в карту
                     ips.put(image, result.getBody());
                 } catch (Exception ignored) {}
+
+                // формирование http ссылки на сформированный IP и порт 7777 для получения имени компьютера
+                // и запроса текущего скриншота
+                final String url2 = "http://" + ip[0] + "." + ip[1] + "." + ip[2] + "." + i + ":7777/name";
+                final String image2 = "http://" + ip[0] + "." + ip[1] + "." + ip[2] + "." + i + ":7777/image";
+
+                try {
+                    // попытка получить сформировать локатор
+                    URI uri = new URI(url2);
+
+                    // получение ответа от сервера:
+                    // - если ошибка, значит сервер на данном IP не запущен
+                    // - иначе вернется имя компьютера
+                    ResponseEntity<String> result = restTemplate.getForEntity(uri, String.class);
+
+                    // помещение пары (url-получения скриншота, имя компьютера) в карту
+                    ips.put(image2, result.getBody());
+                } catch (Exception ignored) {}
             }
         }
         catch (IOException ignored) {}
