@@ -48,32 +48,32 @@ public class ScreenshotService {
      *
      * @return String - имя компьютера
      */
-//    public String getComputerName()
-//    {
-//        Map<String, String> env = System.getenv();
-//        if (env.containsKey("COMPUTERNAME"))
-//            return env.get("COMPUTERNAME");
-//        else if (env.containsKey("HOSTNAME"))
-//            return env.get("HOSTNAME");
-//        else if (env.containsKey("DOCKER_HOSTNAME"))
-//            return env.get("DOCKER_HOSTNAME");
-//        else
-//            return "Unknown Computer";
-//    }
-
     public String getComputerName()
     {
-        String hostname = "";
-        InetAddress address;
-        try {
-            address = InetAddress.getLocalHost();
-            hostname = address.getHostName();
-        }
-        catch (UnknownHostException ex) {
-            hostname = "Undefined";
-        }
-        return hostname;
+        Map<String, String> env = System.getenv();
+        if (env.containsKey("COMPUTERNAME"))
+            return env.get("COMPUTERNAME");
+        else if (env.containsKey("HOSTNAME"))
+            return env.get("HOSTNAME");
+        else if (env.containsKey("DOCKER_HOSTNAME"))
+            return env.get("DOCKER_HOSTNAME");
+        else
+            return "Unknown Computer";
     }
+
+//    public String getComputerName()
+//    {
+//        String hostname = "";
+//        InetAddress address;
+//        try {
+//            address = InetAddress.getLocalHost();
+//            hostname = address.getHostName();
+//        }
+//        catch (UnknownHostException ex) {
+//            hostname = "Undefined";
+//        }
+//        return hostname;
+//    }
 
 
     /**
@@ -144,23 +144,23 @@ public class ScreenshotService {
                     ips.put(image, result.getBody());
                 } catch (Exception ignored) {}
 
-                // формирование http ссылки на сформированный IP и порт 7777 для получения имени компьютера
-                // и запроса текущего скриншота
-                final String url2 = "http://" + ip[0] + "." + ip[1] + "." + ip[2] + "." + i + ":7777/name";
-                final String image2 = "http://" + ip[0] + "." + ip[1] + "." + ip[2] + "." + i + ":7777/image";
-
-                try {
-                    // попытка получить сформировать локатор
-                    URI uri = new URI(url2);
-
-                    // получение ответа от сервера:
-                    // - если ошибка, значит сервер на данном IP не запущен
-                    // - иначе вернется имя компьютера
-                    ResponseEntity<String> result = restTemplate.getForEntity(uri, String.class);
-
-                    // помещение пары (url-получения скриншота, имя компьютера) в карту
-                    ips.put(image2, result.getBody());
-                } catch (Exception ignored) {}
+//                // формирование http ссылки на сформированный IP и порт 7777 для получения имени компьютера
+//                // и запроса текущего скриншота
+//                final String url2 = "http://" + ip[0] + "." + ip[1] + "." + ip[2] + "." + i + ":7777/name";
+//                final String image2 = "http://" + ip[0] + "." + ip[1] + "." + ip[2] + "." + i + ":7777/image";
+//
+//                try {
+//                    // попытка получить сформировать локатор
+//                    URI uri = new URI(url2);
+//
+//                    // получение ответа от сервера:
+//                    // - если ошибка, значит сервер на данном IP не запущен
+//                    // - иначе вернется имя компьютера
+//                    ResponseEntity<String> result = restTemplate.getForEntity(uri, String.class);
+//
+//                    // помещение пары (url-получения скриншота, имя компьютера) в карту
+//                    ips.put(image2, result.getBody());
+//                } catch (Exception ignored) {}
             }
         }
         catch (IOException ignored) {}

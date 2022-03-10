@@ -30,3 +30,5 @@ USER root
 RUN chmod 777 ./configuration.json
 USER developer
 ENTRYPOINT ["java", "-jar", "./app.jar"]
+
+#docker run --rm -e DISPLAY=unix:0.0 -e XAUTHORITY=/tmp/.docker.xauth -e HOSTNAME=mono01 -v /tmp/.X11-unix:/tmp/.X11-unix --net=host mono:latest -d
