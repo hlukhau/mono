@@ -48,32 +48,32 @@ public class ScreenshotService {
      *
      * @return String - имя компьютера
      */
-    public String getComputerName()
-    {
-        Map<String, String> env = System.getenv();
-        if (env.containsKey("COMPUTERNAME"))
-            return env.get("COMPUTERNAME");
-        else if (env.containsKey("HOSTNAME"))
-            return env.get("HOSTNAME");
-        else if (env.containsKey("DOCKER_HOSTNAME"))
-            return env.get("DOCKER_HOSTNAME");
-        else
-            return "Unknown Computer";
-    }
-
 //    public String getComputerName()
 //    {
-//        String hostname = "";
-//        InetAddress address;
-//        try {
-//            address = InetAddress.getLocalHost();
-//            hostname = address.getHostName();
-//        }
-//        catch (UnknownHostException ex) {
-//            hostname = "Undefined";
-//        }
-//        return hostname;
+//        Map<String, String> env = System.getenv();
+//        if (env.containsKey("COMPUTERNAME"))
+//            return env.get("COMPUTERNAME");
+//        else if (env.containsKey("HOSTNAME"))
+//            return env.get("HOSTNAME");
+//        else if (env.containsKey("DOCKER_HOSTNAME"))
+//            return env.get("DOCKER_HOSTNAME");
+//        else
+//            return "Unknown Computer";
 //    }
+
+    public String getComputerName()
+    {
+        String hostname = "";
+        InetAddress address;
+        try {
+            address = InetAddress.getLocalHost();
+            hostname = address.getHostName();
+        }
+        catch (UnknownHostException ex) {
+            hostname = "Undefined";
+        }
+        return hostname;
+    }
 
 
     /**
