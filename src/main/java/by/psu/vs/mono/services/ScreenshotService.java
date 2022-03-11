@@ -16,6 +16,7 @@ import java.net.*;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Slf4j
@@ -84,7 +85,7 @@ public class ScreenshotService {
     }
 
     // Карта обнаруженных IP-адресов
-    public final Map<String, String> ips = new HashMap<>();
+    public Map<String, String> ips = new HashMap<>();
 
     /**
      * Метод пересканирует раз в минуту локальную сеть в поисках установленных на портах 8888 программ Mono
@@ -93,10 +94,9 @@ public class ScreenshotService {
      * @author Vladimir Hlukhau
      */
     @Scheduled(initialDelay=0, fixedDelay = 60000)
-    public synchronized void scanIps() {
+    public void scanIps() {
 
-        // очистка карты валидных локальных ip-адресов
-        ips.clear();
+        Map<String, String> newIps = new HashMap<>();
 
         try {
             // попытка создания соединения с Интернет-сайтом google.com
@@ -133,11 +133,13 @@ public class ScreenshotService {
                     ResponseEntity<String> result = restTemplate.getForEntity(uri, String.class);
 
                     // помещение пары (url-получения скриншота, имя компьютера) в карту
-                    ips.put(image, result.getBody());
+                    newIps.put(image, result.getBody());
                 } catch (Exception ignored) {}
             }
         }
         catch (IOException ignored) {}
+
+        ips = newIps;
     }
 
     /**
