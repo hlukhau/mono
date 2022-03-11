@@ -95,8 +95,6 @@ public class ScreenshotService {
     @Scheduled(initialDelay=0, fixedDelay = 60000)
     public synchronized void scanIps() {
 
-        log.info("Rescan IP addresses");
-
         // очистка карты валидных локальных ip-адресов
         ips.clear();
 

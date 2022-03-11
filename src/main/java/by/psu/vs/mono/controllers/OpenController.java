@@ -63,7 +63,6 @@ import org.springframework.web.servlet.view.RedirectView;
     @GetMapping("/name")
     public @ResponseBody String getName() {
         String name = screenshotService.getComputerName();
-        System.out.println(name);
         return name;
     }
 
