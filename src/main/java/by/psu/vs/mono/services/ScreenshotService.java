@@ -87,15 +87,7 @@ public class ScreenshotService {
     // Карта обнаруженных IP-адресов
     public Map<String, String> ips = new HashMap<>();
 
-    /**
-     * Метод пересканирует раз в минуту локальную сеть в поисках установленных на портах 8888 программ Mono
-     * и заполняет локальный кеш ips.
-     *
-     * @author Vladimir Hlukhau
-     */
-    @Scheduled(initialDelay=0, fixedDelay = 60000)
-    public void scanIps() {
-
+    Runnable scan = () -> {
         Map<String, String> newIps = new HashMap<>();
 
         try {
@@ -140,6 +132,30 @@ public class ScreenshotService {
         catch (IOException ignored) {}
 
         ips = newIps;
+        log.info("Scan finished");
+    };
+
+    Thread scanThread = null;
+    /**
+     * Метод пересканирует раз в минуту локальную сеть в поисках установленных на портах 8888 программ Mono
+     * и заполняет локальный кеш ips.
+     *
+     * @author Vladimir Hlukhau
+     */
+    @Scheduled(initialDelay=0, fixedDelay = 60000)
+    public void scanIps() {
+
+        if (scanThread == null) {
+            scanThread = new Thread(scan);
+            scanThread.start();
+            log.info("New thread created");
+        }
+
+        if (! scanThread.isAlive()) {
+            scanThread = new Thread(scan);
+            scanThread.start();
+            log.info("Thread was closed and starts again");
+        }
     }
 
     /**
