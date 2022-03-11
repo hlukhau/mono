@@ -270,14 +270,16 @@ var images = new Map;
 setInterval(function() {
     var list = document.querySelectorAll("img");
     list.forEach(function(image) {
-        var name = images.get(image);
-        if (name == null) {
-            images.set(image, image.src);
-            name = image.src;
-        }
-        var s = name + "?" + new Date().getTime();
+        if (image.id != "static") {
+            var name = images.get(image);
+            if (name == null) {
+                images.set(image, image.src);
+                name = image.src;
+            }
+            var s = name + "?" + new Date().getTime();
 
-        image.src = s;
+            image.src = s;
+        }
     });
 }, 1000);
 
@@ -287,7 +289,7 @@ setInterval(function() {
 </script>
 </head>
 <body>
-<img th:src="@{'/images/logo.png'}" width="50px" style="float: left;" />
+<img th:src="@{'/images/logo.png'}" id="static" width="50px" style="float: left;" />
 <h1>Welcome to developers Supervisor</h1>
 <button class="button" style="vertical-align:middle" onclick="location.href='/rescan'" type="button"><span>Rescan network </span></button>
 <button id='saveId' class="button" style="vertical-align:middle" type="button"><span>Save desktop</span></button>
