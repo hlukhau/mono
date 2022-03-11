@@ -1,5 +1,6 @@
 package by.psu.vs.mono.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class ScreenshotService {
 
     static {
@@ -48,19 +50,6 @@ public class ScreenshotService {
      *
      * @return String - имя компьютера
      */
-//    public String getComputerName()
-//    {
-//        Map<String, String> env = System.getenv();
-//        if (env.containsKey("COMPUTERNAME"))
-//            return env.get("COMPUTERNAME");
-//        else if (env.containsKey("HOSTNAME"))
-//            return env.get("HOSTNAME");
-//        else if (env.containsKey("DOCKER_HOSTNAME"))
-//            return env.get("DOCKER_HOSTNAME");
-//        else
-//            return "Unknown Computer";
-//    }
-
     public String getComputerName()
     {
         String hostname = "";
@@ -87,7 +76,7 @@ public class ScreenshotService {
         SimpleClientHttpRequestFactory clientHttpRequestFactory
                 = new SimpleClientHttpRequestFactory();
         //Connect timeout
-        clientHttpRequestFactory.setConnectTimeout(10);
+        clientHttpRequestFactory.setConnectTimeout(100);
 
         //Read timeout
         clientHttpRequestFactory.setReadTimeout(1000);
@@ -98,11 +87,16 @@ public class ScreenshotService {
     public final Map<String, String> ips = new HashMap<>();
 
     /**
-     * Метод пересканирует локальную сеть в поисках установленных на портах 8888 программ Mono.
+     * Метод пересканирует раз в минуту локальную сеть в поисках установленных на портах 8888 программ Mono
+     * и заполняет локальный кеш ips.
      *
      * @author Vladimir Hlukhau
      */
-    public void scanIps() {
+    @Scheduled(initialDelay=0, fixedDelay = 60000)
+    public synchronized void scanIps() {
+
+        log.info("Rescan IP addresses");
+
         // очистка карты валидных локальных ip-адресов
         ips.clear();
 
@@ -143,24 +137,6 @@ public class ScreenshotService {
                     // помещение пары (url-получения скриншота, имя компьютера) в карту
                     ips.put(image, result.getBody());
                 } catch (Exception ignored) {}
-
-//                // формирование http ссылки на сформированный IP и порт 7777 для получения имени компьютера
-//                // и запроса текущего скриншота
-//                final String url2 = "http://" + ip[0] + "." + ip[1] + "." + ip[2] + "." + i + ":7777/name";
-//                final String image2 = "http://" + ip[0] + "." + ip[1] + "." + ip[2] + "." + i + ":7777/image";
-//
-//                try {
-//                    // попытка получить сформировать локатор
-//                    URI uri = new URI(url2);
-//
-//                    // получение ответа от сервера:
-//                    // - если ошибка, значит сервер на данном IP не запущен
-//                    // - иначе вернется имя компьютера
-//                    ResponseEntity<String> result = restTemplate.getForEntity(uri, String.class);
-//
-//                    // помещение пары (url-получения скриншота, имя компьютера) в карту
-//                    ips.put(image2, result.getBody());
-//                } catch (Exception ignored) {}
             }
         }
         catch (IOException ignored) {}

@@ -133,8 +133,11 @@
 
     <script type="module">
 window.onload = function() {
+  //console.log("initDrag");
   initDragElement();
+  //console.log("initResize");
   initResizeElement();
+  //console.log("init");
 };
 
 
@@ -273,13 +276,14 @@ setInterval(function() {
             name = image.src;
         }
         var s = name + "?" + new Date().getTime();
+
         image.src = s;
     });
 }, 1000);
 
 
-window.onerror = function() {
-};
+//window.onerror = function() {
+//};
 </script>
 </head>
 <body>

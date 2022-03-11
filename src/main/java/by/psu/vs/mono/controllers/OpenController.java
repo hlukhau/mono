@@ -80,10 +80,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
     @GetMapping("/rescan")
     public RedirectView rescan(Model model) throws IOException {
-
-        // Пересканирование локальной сети всегда
-        screenshotService.scanIps();
-
         var result = makeArrayListOfDesktops();
 
         model.addAttribute("desktops", result);
