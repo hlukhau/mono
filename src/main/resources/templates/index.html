@@ -265,7 +265,17 @@ function initResizeElement() {
   }
 }
 
+
 var images = new Map;
+
+function timeout(ms, promise) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      reject(new Error("timeout"))
+    }, ms)
+    promise.then(resolve, reject)
+  })
+}
 
 setInterval(function() {
     var list = document.querySelectorAll("img");
@@ -273,12 +283,26 @@ setInterval(function() {
         if (image.id != "static") {
             var name = images.get(image);
             if (name == null) {
-                images.set(image, image.src);
-                name = image.src;
+                name = image.alt;
+                images.set(image, name);
+                console.log("added " + name);
             }
             var s = name + "?" + new Date().getTime();
 
-            image.src = s;
+            var index = s.lastIndexOf("/i");
+            var name = s;
+
+            if (index != -1) {
+                name = name.substring(0, index);
+                name += "/name";
+            }
+
+            timeout(100, fetch(name, { mode: 'no-cors' })).then(function(response) {
+                console.log("approve " + s + " alt " + image.alt);
+                image.src = s;
+            }).catch(function(error) {
+                console.log("cancel " + s);
+            });
         }
     });
 }, 1000);
@@ -296,7 +320,7 @@ setInterval(function() {
     <div class="popup" th:each="d : ${desktops}" th:style="${d.style}">
         <div class="popup-header-right"><button onclick="this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">x</button></div>
         <div class="popup-header" th:text="${d.name}"></div>
-        <p><img th:src="${d.url}" width="90%" onerror="this.style.display='none'" onload="this.style.display=''"></p>
+        <p><img src="/images/wait.gif" th:alt="${d.url}" width="90%" onerror="this.style.display='none'" onload="this.style.display=''"></p>
     </div>
 </body>
 
