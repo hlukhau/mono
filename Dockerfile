@@ -37,4 +37,6 @@ USER developer
 
 ENTRYPOINT ["java", "-jar", "./app.jar"]
 #BUILD COMMAND: docker build ./ -t mono
+#LOGIN COMMAND: docker login https://docker.io -u hlukhau -p vo1vo2vo1vo2
+#PUSH  COMMAND: docker push hlukhau/mono:latest
 #RUN COMMAND:   docker run --rm -e DISPLAY=unix:0.0 -e XAUTHORITY=/tmp/.docker.xauth -e HOSTNAME=mono01 -v /tmp/.X11-unix:/tmp/.X11-unix --net=host mono:latest -d
