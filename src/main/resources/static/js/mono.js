@@ -151,7 +151,6 @@ setInterval(function() {
             if (name == null) {
                 name = image.alt;
                 images.set(image, name);
-                console.log("added " + name);
             }
             var s = name + "?" + new Date().getTime();
 
@@ -188,7 +187,6 @@ save.addEventListener('click', function() {
         var src = img.src;
 
         var index = src.indexOf("?");
-        console.log(index);
         var url = src;
 
         if (index != -1) {
@@ -200,8 +198,6 @@ save.addEventListener('click', function() {
     });
 
     json += "]";
-
-    console.log(json);
 
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'http://localhost:8888/save');
