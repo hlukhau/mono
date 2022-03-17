@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style>
+.editor {
+  padding: 10px;
+  margin: 10px;
+  outline: none;
+}
+
+.token-variable {
+  color: blue;
+}
+
+.token-field {
+  color: #842;
+}
+
+.token-mask {
+  color: gray;
+}
+
+.token-string {
+  color: green;
+}
+
+.token-number {
+  color: green;
+}
+
+.token-comparator {
+  color: #0e4;
+}
+
+.token-parentheses {
+  color: red;
+}
+
+.token-operators {
+  color: black;
+}
+</style>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+
+var waitOn = false;
+const collection = [' ', ',', '.', '(', ')', '{', '}', '+', '-', '/', '*'];
+
+$(document).ready(function(){
+    var editor = $("#editorId");
+    var editorElement = document.getElementById("editorId");
+    var hiddenEditorElement = document.getElementById("hiddenEditorId");
+    var program = "if \n ( A1 > 1000 or S1 > 1000 * 6 ) and \n ( PRODUCT_TYPE ='21vek' or ACCOUNT ~ /3012*/ ) { return REJECT; }";
+    var html;
+
+
+    let timerId = setInterval(() => {
+
+            program = editorElement.innerText;
+            html = editorElement.innerHTML;
+
+            const init = {
+                body: program,
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json;charset=UTF-8',
+                },
+            };
+
+            fetch('http://localhost:8099/integration/api/la/dictionary/afm/html', init)
+                .then(function (response) {
+                    response.text().then(function (data) {
+                        console.log('data', data)
+
+                        let offset = Cursor.getCurrentCursorPosition(editorElement);
+
+                        data = data.replaceAll('<br />', '<br />\n');
+                        hiddenEditorElement.innerHTML = data;
+
+                        if (hiddenEditorElement.innerText == editorElement.innerText) {
+                            console.log('set');
+                            editorElement.innerHTML = data;
+                        }
+                        else {
+                            console.log('not equal');
+                            console.log('hidden', hiddenEditorElement.innerText)
+                            console.log('origin', editorElement.innerText)
+                        }
+
+                        Cursor.setCurrentCursorPosition(offset, editorElement);
+                        editorElement.focus();
+                    });
+                })
+                .catch(function() {
+                });
+
+    }, 1000);
+
+    $("button").click(function(){
+
+        $.post( 'http://localhost:8099/integration/api/la/dictionary/afm/html', program).done(function( data ) {
+            console.log(data);
+        });
+
+    });
+
+
+
+
+// Credit to Liam (Stack Overflow)
+// https://stackoverflow.com/a/41034697/3480193
+class Cursor {
+    static getCurrentCursorPosition(parentElement) {
+        var selection = window.getSelection(),
+            charCount = -1,
+            node;
+
+        if (selection.focusNode) {
+            if (Cursor._isChildOf(selection.focusNode, parentElement)) {
+                node = selection.focusNode;
+                charCount = selection.focusOffset;
+
+                while (node) {
+                    if (node === parentElement) {
+                        break;
+                    }
+
+                    if (node.previousSibling) {
+                        node = node.previousSibling;
+                        charCount += node.textContent.length;
+                    } else {
+                        node = node.parentNode;
+                        if (node === null) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return charCount;
+    }
+
+    static setCurrentCursorPosition(chars, element) {
+        if (chars >= 0) {
+            var selection = window.getSelection();
+
+            let range = Cursor._createRange(element, { count: chars });
+
+            if (range) {
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+    }
+
+    static _createRange(node, chars, range) {
+        if (!range) {
+            range = document.createRange()
+            range.selectNode(node);
+            range.setStart(node, 0);
+        }
+
+        if (chars.count === 0) {
+            range.setEnd(node, chars.count);
+        } else if (node && chars.count >0) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                if (node.textContent.length < chars.count) {
+                    chars.count -= node.textContent.length;
+                } else {
+                    range.setEnd(node, chars.count);
+                    chars.count = 0;
+                }
+            } else {
+                for (var lp = 0; lp < node.childNodes.length; lp++) {
+                    range = Cursor._createRange(node.childNodes[lp], chars, range);
+
+                    if (chars.count === 0) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return range;
+    }
+
+    static _isChildOf(node, parentElement) {
+        while (node !== null) {
+            if (node === parentElement) {
+                return true;
+            }
+            node = node.parentNode;
+        }
+
+        return false;
+    }
+}
+
+
+
+});
+</script>
+</head>
+<body>
+
+<button>Send an HTTP POST request to a page and get the result back</button>
+
+<div id="editorId" contenteditable="true" spellcheck="false" class="editor">
+    if ( A1 > 1000 or S1 > 1000 * 6 ) and ( PRODUCT_TYPE ='21vek' or ACCOUNT ~ /3012*/ ) { return REJECT; }</div>
+<div id="hiddenEditorId" contenteditable="true" hidden>
+</div>
+
+
+</body>
+</html>

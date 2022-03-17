@@ -18,11 +18,9 @@ body {
 }
 
 /*Drgable */
-
 .popup {
   position: absolute;
-  /*resize: both; !*enable this to css resize*! */
-  overflow: auto;
+  overflow: hidden;
 }
 
 .popup-header {
@@ -77,7 +75,6 @@ body {
 }
 
 /*NOSELECT*/
-
 .popup * {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
