@@ -140,6 +140,13 @@ body {
   top: 100px;
 }
 
+.copyright {
+    float: right;
+    color: #98b9e3;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
 
 
 
