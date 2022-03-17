@@ -17,9 +17,10 @@
 <img th:src="@{'/images/logo.png'}" id="static" width="90px" style="float: left;" />
 <!--<h1>Welcome to developers Supervisor</h1>-->
 <div class="glitch" data-text="Welcome to developers Supervisor">Welcome to developers Supervisor</div>
-
+<div class="toolbar">
 <button class="button" style="vertical-align:middle" onclick="location.href='/rescan'" type="button"><span>Rescan network </span></button>
 <button id='saveId' class="button" style="vertical-align:middle" type="button"><span>Save desktop</span></button>
+</div>
     <div class="popup" th:each="d : ${desktops}" th:style="${d.style}">
         <div class="popup-header-right"><button onclick="this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">x</button></div>
         <div class="popup-header" th:text="${d.name}"></div>
