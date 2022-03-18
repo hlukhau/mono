@@ -48,6 +48,7 @@
 
 var waitOn = false;
 const collection = [' ', ',', '.', '(', ')', '{', '}', '+', '-', '/', '*'];
+var keydown = false;
 
 $(document).ready(function(){
     var editor = $("#editorId");
@@ -57,11 +58,28 @@ $(document).ready(function(){
     var html;
 
 
+    editorElement.addEventListener('keydown', function() {
+        keydown = true;
+        console.log("keydown = true");
+    });
+
+
     let timerId = setInterval(() => {
 
             program = editorElement.innerText;
             html = editorElement.innerHTML;
-
+/*
+            var editor = document.createElement("div");
+            html = html.replace('<br>', '<br>\n');
+            editor.innerHTML = html;
+            hiddenEditorElement.innerHTML = html;
+                            console.log(editorElement.innerText);
+                            console.log(editor.innerText);
+                            console.log(editorElement.textContent);
+                            console.log(editor.textContent);
+                            console.log(editorElement.innerHTML);
+                            console.log(editor.innerHTML);
+*/
             const init = {
                 body: program,
                 method: 'POST',
@@ -70,34 +88,44 @@ $(document).ready(function(){
                 },
             };
 
-            fetch('http://localhost:8099/integration/api/la/dictionary/afm/html', init)
+            //let offset = getCaret(editorElement);
+            //console.log('data', html, offset);
+            //setCaret(editorElement, offset.start, offset.end);
+            //getPos();
+
+            keydown = false;
+
+            fetch('/html', init)
                 .then(function (response) {
                     response.text().then(function (data) {
+
+                        data = data.replaceAll('\n', '');
+
                         console.log('data', data)
-
-                        let offset = Cursor.getCurrentCursorPosition(editorElement);
-
-                        data = data.replaceAll('<br />', '<br />\n');
                         hiddenEditorElement.innerHTML = data;
 
-                        if (hiddenEditorElement.innerText == editorElement.innerText) {
-                            console.log('set');
+                        if (hiddenEditorElement.textContent == editorElement.textContent) {
+
+                            let offset = getCaret(editorElement);
                             editorElement.innerHTML = data;
+                            setCaret(editorElement, offset.start, offset.end);
+
+                            editorElement.focus();
                         }
                         else {
-                            console.log('not equal');
-                            console.log('hidden', hiddenEditorElement.innerText)
-                            console.log('origin', editorElement.innerText)
+                            console.log(editorElement.innerText);
+                            console.log(hiddenEditorElement.innerText);
+                            console.log(editorElement.innerHTML);
+                            console.log(hiddenEditorElement.innerHTML);
                         }
-
-                        Cursor.setCurrentCursorPosition(offset, editorElement);
-                        editorElement.focus();
                     });
                 })
                 .catch(function() {
                 });
 
-    }, 1000);
+    }, 3000);
+
+
 
     $("button").click(function(){
 
@@ -105,100 +133,61 @@ $(document).ready(function(){
             console.log(data);
         });
 
-    });
+   });
 
 
-
-
-// Credit to Liam (Stack Overflow)
-// https://stackoverflow.com/a/41034697/3480193
-class Cursor {
-    static getCurrentCursorPosition(parentElement) {
-        var selection = window.getSelection(),
-            charCount = -1,
-            node;
-
-        if (selection.focusNode) {
-            if (Cursor._isChildOf(selection.focusNode, parentElement)) {
-                node = selection.focusNode;
-                charCount = selection.focusOffset;
-
-                while (node) {
-                    if (node === parentElement) {
-                        break;
-                    }
-
-                    if (node.previousSibling) {
-                        node = node.previousSibling;
-                        charCount += node.textContent.length;
-                    } else {
-                        node = node.parentNode;
-                        if (node === null) {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return charCount;
+function pathFromNode(node, reference) {
+  function traverse(node, acc) {
+    if (node === reference) {
+      return acc;
+    } else {
+      const parent = node.parentNode;
+      const index = [...parent.childNodes].indexOf(node);
+      return traverse(parent, [index, ...acc]);
     }
+  }
+  return traverse(node, []);
+}
 
-    static setCurrentCursorPosition(chars, element) {
-        if (chars >= 0) {
-            var selection = window.getSelection();
+function nodeFromPath(path, reference) {
+  if (path.length === 0) {
+    return reference;
+  } else {
+    const [index, ...rest] = path;
+    const next = reference.childNodes[index];
+    return nodeFromPath(rest, next);
+  }
+}
 
-            let range = Cursor._createRange(element, { count: chars });
-
-            if (range) {
-                range.collapse(false);
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        }
+function getCaret(el) {
+  const range = document.getSelection().getRangeAt(0);
+  return {
+    start: {
+      container: pathFromNode(range.startContainer, el),
+      offset: range.startOffset
+    },
+    end: {
+      container: pathFromNode(range.endContainer, el),
+      offset: range.endOffset
     }
+  };
+}
 
-    static _createRange(node, chars, range) {
-        if (!range) {
-            range = document.createRange()
-            range.selectNode(node);
-            range.setStart(node, 0);
-        }
+function setCaret(el, start, end) {
+  const range = document.createRange();
+  range.setStart(nodeFromPath(start.container, el), start.offset);
+  range.setEnd(nodeFromPath(end.container, el), end.offset);
+  sel = document.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
 
-        if (chars.count === 0) {
-            range.setEnd(node, chars.count);
-        } else if (node && chars.count >0) {
-            if (node.nodeType === Node.TEXT_NODE) {
-                if (node.textContent.length < chars.count) {
-                    chars.count -= node.textContent.length;
-                } else {
-                    range.setEnd(node, chars.count);
-                    chars.count = 0;
-                }
-            } else {
-                for (var lp = 0; lp < node.childNodes.length; lp++) {
-                    range = Cursor._createRange(node.childNodes[lp], chars, range);
-
-                    if (chars.count === 0) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        return range;
-    }
-
-    static _isChildOf(node, parentElement) {
-        while (node !== null) {
-            if (node === parentElement) {
-                return true;
-            }
-            node = node.parentNode;
-        }
-
-        return false;
-    }
+function update() {
+  const pos = getCaret($el);
+  $startContainer.value = JSON.stringify(pos.start.container);
+  $startOffset.value = pos.start.offset;
+  $endContainer.value = JSON.stringify(pos.end.container);
+  $endOffset.value = pos.end.offset;
 }
 
 
@@ -210,10 +199,8 @@ class Cursor {
 
 <button>Send an HTTP POST request to a page and get the result back</button>
 
-<div id="editorId" contenteditable="true" spellcheck="false" class="editor">
-    if ( A1 > 1000 or S1 > 1000 * 6 ) and ( PRODUCT_TYPE ='21vek' or ACCOUNT ~ /3012*/ ) { return REJECT; }</div>
-<div id="hiddenEditorId" contenteditable="true" hidden>
-</div>
+<div id="editorId" contenteditable="true" spellcheck="false" class="editor"><span style="color: red;">A1</span><div><br></div><div><br></div><div><br></div>&nbsp; <span style="color: red;">A1</span><div><br></div><span style="color: red;">S1</span></div>
+<div id="hiddenEditorId" contenteditable="true" hidden></div>
 
 
 </body>

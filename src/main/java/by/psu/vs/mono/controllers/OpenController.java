@@ -118,4 +118,15 @@ import org.springframework.web.servlet.view.RedirectView;
         }
         return result;
     }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping(
+            value = "/html",
+            produces = "text/plain"
+    )
+    @ResponseBody public String getHtml(@RequestBody String program) {
+
+        return screenshotService.getHtmlProgram(program);
+    }
+
 }
