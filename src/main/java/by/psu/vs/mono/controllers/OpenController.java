@@ -1,28 +1,22 @@
 package by.psu.vs.mono.controllers;
 
+import by.psu.vs.mono.services.ChatService;
 import by.psu.vs.mono.services.ScreenshotService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.view.RedirectView;
 
 @Slf4j
 @Controller
@@ -31,14 +25,12 @@ import org.springframework.web.servlet.view.RedirectView;
     @Autowired
     private ScreenshotService screenshotService;
 
-    @RequestMapping(value = "/make", method = RequestMethod.GET)
-    public void make() {
-        screenshotService.makeScreenShot("saved.png");
-    }
+    @Autowired
+    private ChatService chatService;
 
     @GetMapping(
-            value = "/image",
-            produces = "image/jpg"
+        value = "/image",
+        produces = "image/png"
     )
     public @ResponseBody byte[] getImageWithMediaType() throws IOException {
         return screenshotService.getScreenShot();
@@ -64,6 +56,24 @@ import org.springframework.web.servlet.view.RedirectView;
     public @ResponseBody String getName() {
         String name = screenshotService.getComputerName();
         return name;
+    }
+
+    @PostMapping("/send")
+    public String send(@RequestBody String text) {
+        log.info("TEXT RECEIVED: {}", text);
+        chatService.saveMessage(text);
+        return "ok";
+    }
+
+    @GetMapping("/chat")
+    public @ResponseBody String getChatMap() {
+        StringBuilder sb = new StringBuilder();
+        chatService.getChatMap().forEach((k,v) -> {
+            sb.append("<br />")/*.append(k).append(":")*/.append(v);
+        });
+
+
+        return sb.toString();
     }
 
     @PostMapping("/save")
@@ -118,15 +128,4 @@ import org.springframework.web.servlet.view.RedirectView;
         }
         return result;
     }
-
-    @CrossOrigin(origins = "*")
-    @PostMapping(
-            value = "/html",
-            produces = "text/plain"
-    )
-    @ResponseBody public String getHtml(@RequestBody String program) {
-
-        return screenshotService.getHtmlProgram(program);
-    }
-
 }

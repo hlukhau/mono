@@ -14,8 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +30,7 @@ public class ScreenshotService {
     /**
      * Шедулер получения картинки раз в секунду
      */
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 100)
     public void  scheduleFixedDelayTask() {
         makeScreenShot("saved.png");
     }
@@ -190,7 +188,7 @@ public class ScreenshotService {
             try {
                 // сохранение скриншота в файл
                 File outputFile = new File(path);
-                ImageIO.write(bufferedImage, "jpg", outputFile);
+                ImageIO.write(bufferedImage, "png", outputFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -199,22 +197,4 @@ public class ScreenshotService {
             e.printStackTrace();
         }
     }
-
-    public String getHtmlProgram (String program) {
-        log.info("PROGRAM validate: " + program);
-        String html = "";
-        List<String> vars = new ArrayList<>();
-
-        vars.add("S1");
-        vars.add("A1");
-
-        html = program.replaceAll("\n\n", "<div><br></div>");
-        html = html.replaceAll("A1", "<span style='color: red;'>A1</span>");
-        html = html.replaceAll("S1", "<span style='color: red;'>S1</span>");
-
-        System.out.println(html);
-
-        return html;
-    }
-
 }

@@ -1,37 +1,42 @@
 package by.psu.vs.mono;
 
+import by.psu.vs.mono.model.Student;
+import by.psu.vs.mono.repositories.GroupRepository;
+import by.psu.vs.mono.repositories.StudentsRepository;
 import by.psu.vs.mono.services.ScreenshotService;
 import by.psu.vs.mono.utils.EchoClient;
-import by.psu.vs.mono.utils.EchoServer;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.web.client.RestTemplate;
 
 import javax.imageio.ImageIO;
-import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.*;
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.net.InetAddress;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SpringBootTest(classes = MonoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
+//@DataJpaTest
+//@AutoConfigureEmbeddedDatabase
 class MonoApplicationTests {
 
 	static {
 		System.setProperty("java.awt.headless", "false");
 	}
+
+	@Autowired
+	private StudentsRepository studentsRepository;
+
+	@Autowired
+	private GroupRepository groupRepository;
 
 	@Autowired
 	private ScreenshotService screenshotService;
@@ -156,6 +161,7 @@ class MonoApplicationTests {
 		//if (hostname.length() == 0) {
 			hostname = ip;
 		//}
+
 		return hostname;
 	}
 
@@ -188,6 +194,36 @@ class MonoApplicationTests {
 
 		screenshotService.ips.forEach((k,v) -> {
 			if(! "".equals(v)) {log.info(k + " " + v);}
+		});
+	}
+
+	@Test
+	public void dbTest() {
+		var students = studentsRepository.findAll();
+
+		students.forEach(student -> {
+			log.info("STUDENT: {}, {}", student.getName(), student.getAddress());
+		});
+
+		var group = groupRepository.findById(1L).get();
+
+		Student student3 = Student.builder()
+				.address("44444")
+				.name("44444")
+				.group(group)
+				.build();
+
+		studentsRepository.save(student3);
+
+		var groups = groupRepository.findAll();
+
+		groups.forEach(g -> {
+
+			log.info("GROUP: {}", g.getName());
+
+			g.getStudents().forEach(student -> {
+				log.info("  STUDENT: {}, {}", student.getName(), student.getAddress());
+			});
 		});
 	}
 }

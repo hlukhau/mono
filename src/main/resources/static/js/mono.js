@@ -143,10 +143,33 @@ function timeout(ms, promise) {
   })
 }
 
+function sendtext() {
+    var text = document.getElementById("chat_text");
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/send');
+    xhr.setRequestHeader('Content-Type', 'text/plain;charset=UTF-8');
+    xhr.send(text.value);
+}
+
+setInterval(function() {
+     timeout(100, fetch('/chat', { mode: 'no-cors' })).then(function(response) {
+        response.text().then(function(result) {
+            var div = document.getElementById("chat_body");
+            div.innerHTML = result;
+            console.log(result);
+        });
+     }).catch(function(error) {});
+}, 1000);
+
+
+
 setInterval(function() {
     var list = document.querySelectorAll("img");
+
     list.forEach(function(image) {
+
         if (image.id != "static") {
+
             var name = images.get(image);
             if (name == null) {
                 name = image.alt;
@@ -167,7 +190,7 @@ setInterval(function() {
             }).catch(function(error) {});
         }
     });
-}, 1000);
+}, 500);
 
 var save = document.getElementById('saveId');
 
@@ -200,7 +223,7 @@ save.addEventListener('click', function() {
     json += "]";
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://localhost:8888/save');
+    xhr.open('POST', '/save');
     xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
     xhr.send(json);
 });
