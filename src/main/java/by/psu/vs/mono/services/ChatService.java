@@ -15,7 +15,13 @@ public class ChatService {
         chatMap.put(Instant.now().toString(), text);
     }
 
-    public Map<String, String> getChatMap() {
-        return chatMap;
+    public synchronized String getChatMap() {
+        StringBuilder sb = new StringBuilder();
+
+        chatMap.forEach((k,v) -> {
+            sb.append("<br />")/*.append(k).append(":")*/.append(v);
+        });
+
+        return sb.toString();
     }
 }

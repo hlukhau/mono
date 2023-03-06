@@ -67,13 +67,7 @@ import java.util.Map;
 
     @GetMapping("/chat")
     public @ResponseBody String getChatMap() {
-        StringBuilder sb = new StringBuilder();
-        chatService.getChatMap().forEach((k,v) -> {
-            sb.append("<br />")/*.append(k).append(":")*/.append(v);
-        });
-
-
-        return sb.toString();
+        return chatService.getChatMap();
     }
 
     @PostMapping("/save")
