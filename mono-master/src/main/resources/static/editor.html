@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style>
+.editor {
+  padding: 10px;
+  margin: 10px;
+  outline: none;
+}
+
+.token-variable {
+  color: blue;
+}
+
+.token-field {
+  color: #842;
+}
+
+.token-mask {
+  color: gray;
+}
+
+.token-string {
+  color: green;
+}
+
+.token-number {
+  color: green;
+}
+
+.token-comparator {
+  color: #0e4;
+}
+
+.token-parentheses {
+  color: red;
+}
+
+.token-operators {
+  color: black;
+}
+</style>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+
+const collection = [' ', ',', '.', '(', ')', '{', '}', '+', '-', '/', '*'];
+
+$(document).ready(function(){
+
+    var url = 'http://192.168.190.37/integration/api/la/dictionary/html';
+
+    var editorElement = document.getElementById("editorId");
+    var hiddenEditorElement = document.getElementById("hiddenEditorId");
+
+
+
+    let timerId = setInterval(() => {
+
+            program = editorElement.innerText;
+            //console.log('pro3', convertToHex(program));
+
+            const init = {
+                body: program,
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json;charset=UTF-8',
+                },
+            };
+
+            fetch(url, init)
+                .then(function (response) {
+                    response.text().then(function (data) {
+
+                        //console.log('data', data)
+                        hiddenEditorElement.innerHTML = data;
+                        var originText = editorElement.innerText;
+                        originText = originText.replaceAll("\x20", "\xa0");
+
+
+                        if (hiddenEditorElement.innerText == originText) {
+
+
+                            try {
+                                let offset = Cursor.getCurrentCursorPosition(editorElement);
+                                Cursor.setCurrentCursorPosition(offset, hiddenEditorElement);
+                                editorElement.innerHTML = data;
+                                //console.log('dat2', editorElement.innerHTML);
+                                Cursor.setCurrentCursorPosition(offset, editorElement);
+
+                                editorElement.focus();
+                            }
+                            catch (e) {
+                                //console.log("error", e);
+                            }
+                        }
+                        else {
+/*
+                            console.log(convertToHex(originText));
+                            console.log(convertToHex(hiddenEditorElement.innerText));
+                            console.log(editorElement.innerHTML);
+                            console.log(hiddenEditorElement.innerHTML);
+*/
+                        }
+                    });
+                })
+                .catch(function() {
+                });
+
+    }, 3000);
+
+
+
+function convertFromHex(hex) {
+    var hex = hex.toString();//force conversion
+    var str = '';
+    for (var i = 0; i < hex.length; i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 1), 16));
+    return str;
+}
+
+function convertToHex(str) {
+    var hex = '';
+    for(var i=0;i<str.length;i++) {
+        hex += ' '+str.charCodeAt(i).toString(16);
+    }
+    return hex;
+}
+
+
+// Credit to Liam (Stack Overflow)
+// https://stackoverflow.com/a/41034697/3480193
+class Cursor {
+    static getCurrentCursorPosition(parentElement) {
+        var selection = window.getSelection(),
+            charCount = -1,
+            node;
+
+        if (selection.focusNode) {
+            if (Cursor._isChildOf(selection.focusNode, parentElement)) {
+                node = selection.focusNode;
+                charCount = selection.focusOffset;
+
+                while (node) {
+                    if (node === parentElement) {
+                        break;
+                    }
+
+                    if (node.previousSibling) {
+                        node = node.previousSibling;
+                        charCount += node.textContent.length;
+                    } else {
+                        node = node.parentNode;
+                        if (node === null) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return charCount;
+    }
+
+    static setCurrentCursorPosition(chars, element) {
+        if (chars >= 0) {
+            var selection = window.getSelection();
+
+            let range = Cursor._createRange(element, { count: chars });
+
+            if (range) {
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+    }
+
+    static _createRange(node, chars, range) {
+        if (!range) {
+            range = document.createRange()
+            range.selectNode(node);
+            range.setStart(node, 0);
+        }
+
+        if (chars.count === 0) {
+            range.setEnd(node, chars.count);
+        } else if (node && chars.count >0) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                if (node.textContent.length < chars.count) {
+                    chars.count -= node.textContent.length;
+                } else {
+                    range.setEnd(node, chars.count);
+                    chars.count = 0;
+                }
+            } else {
+                for (var lp = 0; lp < node.childNodes.length; lp++) {
+                    range = Cursor._createRange(node.childNodes[lp], chars, range);
+
+                    if (chars.count === 0) {
+                    break;
+                    }
+                }
+            }
+        }
+
+        return range;
+    }
+
+    static _isChildOf(node, parentElement) {
+        while (node !== null) {
+            if (node === parentElement) {
+                return true;
+            }
+            node = node.parentNode;
+        }
+
+        return false;
+    }
+}
+});
+</script>
+</head>
+<body>
+
+
+<div id="editorId" contenteditable="true" spellcheck="false" class="editor"><span class='token-operators'>if</span>&nbsp;<span class='token-variable'>A1</span><span class='token-comparator'>></span><span class='token-number'>10</span>&nbsp;and&nbsp;<span class='token-variable'>S1</span>&nbsp;<span class='token-comparator'>=</span>&nbsp;<span class='token-number'>9</span>&nbsp;<span class='token-parentheses'>{</span><span class='token-operators'>return</span>&nbsp;<span class='token-field'>TRUE</span>;<span class='token-parentheses'>}</span></div>
+<div id="hiddenEditorId" contenteditable="true" hidden></div>
+
+
+</body>
+</html>
