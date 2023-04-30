@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>PSU</title>
+    <link rel="shortcut icon" type="image/png" href="/images/logo.png"/>
+    <link rel="stylesheet" href="/css/mono.css">
+    <link rel="stylesheet" href="/css/mono-glitch.css">
+
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>-->
+    <link href='https://fonts.googleapis.com/css?family=Varela' rel='stylesheet' type='text/css'>
+</head>
+
+
+
+<body>
+<img th:src="@{'/images/logo.png'}" id="static" width="90px" style="float: left;" />
+<!--<h1>Welcome to developers Supervisor</h1>-->
+<div class="glitch" data-text="Welcome to developers Supervisor">Welcome to developers Supervisor</div>
+<div class="toolbar">
+    <div class="copyright">Copyright (c) Vladimir Hlukhau, 2022</div>
+    <button class="button" style="vertical-align:middle" onclick="location.href='/rescan'" type="button"><span>Rescan network </span></button>
+    <button id='saveId' class="button" style="vertical-align:middle" type="button"><span>Save desktop</span></button>
+</div>
+<div class="popup" th:each="d : ${desktops}" th:style="${d.style}">
+    <div class="popup-header-right"><button onclick="this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)">x</button></div>
+    <div class="popup-header" th:text="${d.name}"></div>
+    <p><img src="/images/wait.gif" th:alt="${d.url}" width="90%" onerror="this.style.display='none'" onload="this.style.display=''"></p>
+</div>
+
+<div class="chat" id="chat">
+    <div class = "text_in_chat" id="chat_body">
+    </div>
+<br />
+    <input type="text" id="chat_text" /> <input type="submit" id="chat_send" onclick="
+    sendtext()
+
+"/>
+</div>
+</body>
+
+<script src="/js/mono.js"></script>
+
+</html>

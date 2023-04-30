@@ -1,0 +1,1 @@
+C:\Users\DimaPC\.jdks\openjdk-17.0.1\bin\java -jar target/mono-0.0.1-SNAPSHOT.jar

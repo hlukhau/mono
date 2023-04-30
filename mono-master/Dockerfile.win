@@ -1,0 +1,44 @@
+FROM mcr.microsoft.com/java/jdk:17-zulu-windowsservercore
+
+RUN NET USER my_admin /add
+RUN	NET LOCALGROUP Administrators /add my_admin
+
+USER my_admin
+
+
+SHELL ["cmd", "/s", "/c"]
+
+ENV DISPLAY localhost:0.0
+ENV JAVA_HOME C:\\openjdk-17
+# "ERROR: Access to the registry path is denied."
+#USER ContainerAdministrator
+RUN echo Updating PATH: %JAVA_HOME%\bin;%PATH% \
+	&& echo Complete.
+#USER ContainerUser
+
+# https://jdk.java.net/
+# >
+# > Java Development Kit builds, from Oracle
+# >
+ENV JAVA_VERSION 17.0.2
+
+COPY --from=openjdk:17.0.2-jdk-windowsservercore-1809 $JAVA_HOME $JAVA_HOME
+
+RUN echo Verifying install ... \
+	&& echo   javac --version && javac --version \
+	&& echo   java --version && java --version \
+	&& echo Complete.
+
+# "jshell" is an interactive REPL for Java (see https://en.wikipedia.org/wiki/JShell)
+#CMD ["jshell"]
+COPY target/mono-0.0.1-SNAPSHOT.jar app.jar
+COPY configuration.json configuration.json
+
+EXPOSE 8888
+
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+#ADM_SHELL: Enable-WindowsOptionalFeature -Online -FeatureName $("Microsoft-Hyper-V", "Containers") -All
+#BUILD COMMAND: docker build ./ -t mono
+#RUN COMMAND:   docker run --rm -e DISPLAY=unix:0.0 -e XAUTHORITY=/tmp/.docker.xauth -e HOSTNAME=mono01 -v /tmp/.X11-unix:/tmp/.X11-unix --net=host mono:latest -d
